@@ -1,0 +1,78 @@
+<project name="cn.com.agree.esb.sdk.soap" default="jar" basedir=".">
+	<property name="pro.name"                value="cn.com.agree.esb.sdk.soap" />
+	<property name="pro.version"             value="1.1"/>
+	<property name="source.home"             value="src"/>
+	<property name="config.home"             value="src/config"/>
+	<property name="build.home"              value="classes"/>
+	<property name="doc.home"                value="doc"/>
+	<property name="target.home"             value="target"/>
+	<property name="lib.home"                value="lib"/>
+	<property name="final.name"              value="${pro.name}-${pro.version}"/>
+	<path id="compile.classpath">
+	    <pathelement location="${build.home}"/>
+		<pathelement location="${config.home}"/>
+		<fileset dir="${lib.home}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="src.path">
+		<fileset dir="${source.home}">
+			<exclude name="config/**/*"/>
+			<exclude name="**/*Test*"/>
+		</fileset>
+	</path>
+	
+	
+	<target name="init">
+		<mkdir dir="${build.home}"/>
+		<mkdir dir="${target.home}"/>
+		<mkdir dir="${doc.home}"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.home}"/>
+		<delete dir="${target.home}"/>
+		<delete dir="${doc.home}" />
+	</target>
+
+	<target name="javac" depends="init">
+		<echo message="*** Compiling all classes ***" />
+		<javac srcdir="${source.home}" sourcepath="src.path" destdir="${build.home}" nowarn="true" verbose="false" encoding="UTF-8" debug="true">
+			<classpath refid="compile.classpath"/>
+		</javac>
+		<echo message="Compiled successfully!!" />
+	</target>
+	
+	<target name="javadoc" depends="init" >
+		<javadoc destdir="${doc.home}" sourcepath="${source.home}" packagenames="*" encoding="UTF-8">
+			<classpath refid="compile.classpath"/>
+		</javadoc>
+	</target>
+	
+	
+	<target name="jar" depends="build">
+		<jar basedir="${build.home}" jarfile="${target.home}/${final.name}.jar">
+			<exclude name="**/.svn/" />
+			<exclude name="**/.copyarea.db" />
+		</jar>
+	</target>
+	
+	<target name="cpcfg">
+		<copydir dest="${target.home}/config" src="${config.home}">
+			<exclude name="**/.copyarea.db" />
+		</copydir>
+	</target>
+	<target name="copylibs">
+		<copydir dest="${target.home}/lib/" src="${lib.home}">
+			<exclude name="**/.copyarea.db" />
+		</copydir>
+	</target>
+	
+	<target name="dist" depends="jar,cpcfg,copylibs">
+		<tar destfile="aesb.tar" basedir="${target.home}">
+		</tar>
+	</target>
+	
+	<target name="build" depends="clean,javac,javadoc" />
+</project>
